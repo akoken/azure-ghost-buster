@@ -3,6 +3,7 @@ var Promise = require("bluebird"),
   path = require("path"),
   BlobService = require("./azureStorageService.js"),
   BaseStore = require("ghost-storage-base"),
+  readFile = require("fs"),
   options = {},
   mimeTypes = {
     ".jpg": "image/jpeg",
@@ -46,13 +47,7 @@ class AzureGhostStorage extends BaseStore {
 
   exists(fileName) {
     var blobService = new BlobService(options);
-    return new Promise((resolve, reject) => {
-      return blobService
-        .doesBlobExist(fileName)
-        .promise()
-        .then(() => resolve(true))
-        .catch(() => resolve(false));
-    });
+    return blobService.doesBlobExist(fileName);
   }
 
   save(image, targetDir) {
@@ -60,44 +55,40 @@ class AzureGhostStorage extends BaseStore {
     var blobService = new BlobService(options);
     var blobName;
 
-    return new Promise((resolve, reject) => {
-      Promise.all([this.getUniqueFileName(image, targetDir)])
-        .then(function(fileName, file) {
-          blobName = filename;
-          var blobOptions = {
-            contentSettings: {
-              cacheControl: "public, max-age=31536000"
-            }
-          };
+    return this.getUniqueFileName(image, targetDir)
+      .then(function(filename) {
+        blobName = filename;
 
-          var ext = path.extname(image.name);
-          if (ext) {
-            var contentType = mimeTypes[ext];
-            if (contentType) {
-              blobOptions.contentSettings.contentType = contentType;
-            }
+        var blobOptions = {
+          contentSettings: {
+            cacheControl: "public, max-age=31536000"
           }
+        };
 
-          blobService
-            .createBlockBlobFromLocalFileAsync(
-              blobName,
-              image.path,
-              blobOptions
-            )
-            .promise()
-            .then(function() {
-              var blobUrl = blobService.getUrl(blobName);
+        var ext = path.extname(image.name);
+        if (ext) {
+          var contentType = mimeTypes[ext];
+          if (contentType) {
+            blobOptions.contentSettings.contentType = contentType;
+          }
+        }
 
-              if (!options.cdnUrl) {
-                resolve(blobUrl);
-              }
+        return blobService.createBlockBlobFromLocalFileAsync(
+          blobName,
+          image.path,
+          blobOptions
+        );
+      })
+      .delay(500)
+      .then(function() {
+        var blobUrl = blobService.getUrl(blobName);
+        if (!options.cdnUrl) {
+          return blobUrl;
+        }
 
-              var parsedUrl = url.parse(blobUrl, true, true);
-              resolve(options.cdnUrl + parsedUrl.path);
-            });
-        })
-        .catch(error => reject(error));
-    });
+        var parsedUrl = url.parse(blobUrl, true, true);
+        return options.cdnUrl + parsedUrl.path;
+      });
   }
 
   serve() {
