@@ -1,7 +1,7 @@
 {
   "name": "azure-ghost-buster",
   "version": "1.0.0",
-  "description": "Azure Storage Adapter for Ghost 1.0",
+  "description": "Azure Blob Storage Adapter for Ghost v1.0",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,8 +10,9 @@
   "license": "MIT",
   "keywords": [
     "ghost",
+    "microsoft",
     "azure",
-    "microsoft",    
+    "blob",    
     "storage"
   ],
   "dependencies": {

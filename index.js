@@ -1,7 +1,7 @@
 var Promise = require("bluebird"),
   url = require("url"),
   path = require("path"),
-  BlobService = require("./azureStorageService.js"),
+  BlobService = require("./azureBlobService.js"),
   BaseStore = require("ghost-storage-base"),
   readFile = require("fs"),
   options = {},
@@ -98,9 +98,7 @@ class AzureGhostStorage extends BaseStore {
   }
 
   read() {
-    /*
-     * Dummy function as ghost needs it
-     */
+    //not implemented method because ghost needs it.
   }
 }
 
