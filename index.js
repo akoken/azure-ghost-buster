@@ -1,7 +1,7 @@
 var Promise = require("bluebird"),
   url = require("url"),
   path = require("path"),
-  BlobService = require("./blobService.js"),
+  BlobService = require("./azureStorageService.js"),
   BaseStore = require("ghost-storage-base"),
   options = {},
   mimeTypes = {
@@ -16,7 +16,7 @@ var Promise = require("bluebird"),
     ".tiff": "image/tiff"
   };
 
-class AzureBlobStore extends BaseStore {
+class AzureGhostStorage extends BaseStore {
   constructor(config = {}) {
     super(config);
 
@@ -113,4 +113,4 @@ class AzureBlobStore extends BaseStore {
   }
 }
 
-module.exports = AzureBlobStore;
+module.exports = AzureGhostStorage;
